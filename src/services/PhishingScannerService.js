@@ -1,8 +1,8 @@
 import axios from "axios";
 
 // Constants for API endpoints
-const URL_API_ENDPOINT = "http://127.0.0.1:5002/predicturl"; // URL scanning endpoint
-const IMAGE_API_ENDPOINT = "http://127.0.0.1:5001/predict";  // Image scanning endpoint
+const URL_API_ENDPOINT = import.meta.env.VITE_URL_API_ENDPOINT || "http://127.0.0.1:5002/predicturl";
+const IMAGE_API_ENDPOINT = import.meta.env.VITE_IMAGE_API_ENDPOINT || "http://127.0.0.1:5001/predict";
 
 /**
  * Sends a request to check if a URL is a phishing site
@@ -12,9 +12,9 @@ const IMAGE_API_ENDPOINT = "http://127.0.0.1:5001/predict";  // Image scanning e
 export const checkPhishingLink = async (url) => {
   try {
     const response = await axios.post(URL_API_ENDPOINT, { url });
-    
+
     console.log("URL Backend Response:", JSON.stringify(response.data, null, 2));
-    
+
     // Transform the response to match the frontend's expected format
     return {
       isPhishing: response.data.prediction === "Phishing",
@@ -45,15 +45,15 @@ export const scanFile = async (formData) => {
       // No need to set Content-Type when using FormData,
       // the browser will set it automatically with boundary
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || "Failed to scan file");
     }
-    
+
     const data = await response.json();
     console.log("Image Backend Response:", data);
-    
+
     return data;
   } catch (error) {
     console.error("Error in scanFile service:", error);
